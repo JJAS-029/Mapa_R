@@ -28,6 +28,32 @@ const baseMaps = {
 };
 L.control.layers(baseMaps).addTo(map);
 
+// =========================================================
+// --- BUSCADOR DE DIRECCIONES ---
+// =========================================================
+const geocoder = L.Control.geocoder({
+    defaultMarkGeocode: false, // Evita el marcador por defecto para personalizarlo
+    placeholder: "Buscar dirección, colonia o lugar...",
+    errorMessage: "No se encontraron resultados."
+}).on('markgeocode', function(e) {
+    // Cuando el usuario selecciona un resultado del buscador:
+    const bbox = e.geocode.bbox; // Área delimitada del resultado
+    const centro = e.geocode.center; // Coordenada central
+
+    // 1. Acercar el mapa al lugar encontrado
+    map.fitBounds(bbox);
+
+    // 2. Colocar un marcador temporal en el lugar
+    // (Opcional: Si ya tenías un marcador previo del buscador, aquí podrías borrarlo)
+    L.marker(centro).addTo(map)
+        .bindPopup(`<b>Ubicación encontrada:</b><br>${e.geocode.name}`)
+        .openPopup();
+
+    // 3. Mostrar el botón para regresar a la vista general
+    document.getElementById('btn-reset-vista').style.display = 'block';
+
+}).addTo(map);
+
 // --- CAPAS GEOGRÁFICAS ---
 let capaMunicipios, capaColonias;
 
